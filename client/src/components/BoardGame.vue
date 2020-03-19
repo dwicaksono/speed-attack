@@ -2,44 +2,24 @@
   <div>
     <section class="row">
       <form @submit.prevent="enterName">
-        <input
-          type="text"
-          name=""
-          placeholder="Enter your name"
-          v-model="username"
-        />
+        <input type="text" name placeholder="Enter your name" v-model="username" />
         <button type="submit">join</button>
       </form>
       <div class="small-6 columns" v-if="log">
         <h1 class="text-center">{{ this.$store.state.player1 }}</h1>
-        <div
-          class="boxAktor"
-          v-if="diem && !serang && !serangspecial && !tangkis && !giveUp"
-        >
+        <div class="boxAktor" v-if="diem && !serang">
           <img :src="dataImage.diem" alt />
         </div>
-        <div
-          class="boxAktor"
-          v-if="!diem && serang && !serangspecial && !tangkis && !giveUp"
-        >
+        <div class="boxAktor" v-if="!diem && serang">
           <img :src="dataImage.attack" alt />
         </div>
-        <div
-          class="boxAktor"
-          v-if="!diem && !serang && serangspecial && !tangkis && !giveUp"
-        >
+        <div class="boxAktor" v-if="!diem && !serang">
           <img :src="dataImage.special" alt />
         </div>
-        <div
-          class="boxAktor"
-          v-if="!diem && !serang && !serangspecial && tangkis && !giveUp"
-        >
+        <div class="boxAktor" v-if="!diem && !serang">
           <img :src="dataImage.heal" alt />
         </div>
-        <div
-          class="boxAktor"
-          v-if="!diem && !serang && !serangspecial && !tangkis && giveUp"
-        >
+        <div class="boxAktor" v-if="!diem && !serang">
           <img :src="dataImage.giveUp" alt />
         </div>
         <div class="healthbar">
@@ -47,21 +27,32 @@
             class="healthbar text-center"
             style="background-color: green; margin: 0; color: white;"
             :style="{ width: $store.state.player1Health + '%' }"
-          >
-            {{ this.$store.state.player1Health }}
-          </div>
+          >{{ this.$store.state.player1Health }}</div>
         </div>
       </div>
       <div class="small-6 columns" v-if="log">
         <h1 class="text-center">{{ this.$store.state.player2 }}</h1>
+        <div class="boxAktor" v-if="diem2 && !serang2 && !serangspecial && !tangkis && !giveUp">
+          <img :src="dataImage.diem" alt style="transform: scaleX(-1);" />
+        </div>
+        <div class="boxAktor" v-if="!diem2 && serang2 && !serangspecial && !tangkis && !giveUp">
+          <img :src="dataImage.attack" alt style="transform: scaleX(-1);" />
+        </div>
+        <div class="boxAktor" v-if="!diem2 && !serang2 && serangspecial && !tangkis && !giveUp">
+          <img :src="dataImage.special" alt style="transform: scaleX(-1);" />
+        </div>
+        <div class="boxAktor" v-if="!diem2 && !serang2 && !serangspecial && tangkis && !giveUp">
+          <img :src="dataImage.heal" alt style="transform: scaleX(-1);" />
+        </div>
+        <div class="boxAktor" v-if="!diem2 && !serang2 && !serangspecial && !tangkis && giveUp">
+          <img :src="dataImage.giveUp" alt style="transform: scaleX(-1);" />
+        </div>
         <div class="healthbar">
           <div
             class="healthbar text-center"
             style="background-color: green; margin: 0; color: white;"
             :style="{ width: $store.state.player2Health + '%' }"
-          >
-            {{ this.$store.state.player2Health }}
-          </div>
+          >{{ this.$store.state.player2Health }}</div>
         </div>
       </div>
     </section>
@@ -69,7 +60,7 @@
       <div class="small-12 columns">
         <!-- <button id="start-game" @click="toActionStartGame">
           START NEW GAME
-        </button> -->
+        </button>-->
       </div>
     </section>
     <section class="row controls" v-else>
@@ -104,7 +95,7 @@ import Swal from "sweetalert2";
 export default {
   name: "BoardGame",
   created() {
-    // this.start.play()
+    this.start.play();
     socket.on("afterAttack", data => {
       if (localStorage.player == data.username) {
         this.$store.state.player2Health -= data.damage;
@@ -114,7 +105,8 @@ export default {
           const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
               confirmButton: "btn btn-success",
-              cancelButton: "btn btn-danger"
+              cancelButton: "btn btn-danger",
+              allowOutsideClick: false
             },
             buttonsStyling: false
           });
@@ -125,13 +117,19 @@ export default {
               confirmButtonText: "Rematch?"
             })
             .then(result => {
-              this.$store.state.player1 = ''
-              this.$store.state.player2 = ''
-              localStorage.removeItem('player')
-              this.log = false
-              this.theme.pause()
+              this.$store.state.player1 = "";
+              this.$store.state.player2 = "";
+              localStorage.removeItem("player");
+              this.log = false;
+              this.theme.pause();
             });
         }
+        this.diem = false;
+        this.serang = true;
+        this.hit.play();
+        this.kageKabur.pause();
+        this.rasenGan.pause();
+        console.log("nyerang");
       } else {
         this.$store.state.player1Health -= data.damage;
         if (this.$store.state.player1Health <= 0) {
@@ -140,7 +138,8 @@ export default {
           const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
               confirmButton: "btn btn-success",
-              cancelButton: "btn btn-danger"
+              cancelButton: "btn btn-danger",
+              allowOutsideClick: false
             },
             buttonsStyling: false
           });
@@ -151,13 +150,19 @@ export default {
               confirmButtonText: "Rematch?"
             })
             .then(result => {
-              this.$store.state.player1 = ''
-              this.$store.state.player2 = ''
-              localStorage.removeItem('player')
-              this.log = false
-              this.theme.pause()
+              this.$store.state.player1 = "";
+              this.$store.state.player2 = "";
+              localStorage.removeItem("player");
+              this.log = false;
+              this.theme.pause();
             });
         }
+        this.diem2 = false;
+        this.serang2 = true;
+        this.hit.play();
+        this.kageKabur.pause();
+        this.rasenGan.pause();
+        console.log("nyerang");
       }
     });
     socket.on("addPlayer", username => {
@@ -178,9 +183,8 @@ export default {
       log: false,
       diem: false,
       serang: false,
-      serangspecial: false,
-      tangkis: false,
-      giveUp: false,
+      diem2: false,
+      serang2: false,
       username: null,
       dataImage: {
         diem:
@@ -207,22 +211,24 @@ export default {
       this.theme.play();
       this.$store.commit("startGame");
       this.diem = true;
+      this.diem2 = true;
       this.serang = false;
+      this.serang2 = false;
       this.serangspecial = false;
       this.tangkis = false;
       this.giveUp = false;
     },
     actionToAttack() {
       this.$store.dispatch("attack", this.username);
-      this.diem = false;
-      this.serang = true;
-      this.serangspecial = false;
-      this.tangkis = false;
-      this.giveUp = false;
-      this.hit.play();
-      this.kageKabur.pause();
-      this.rasenGan.pause();
-      console.log("nyerang");
+      // this.diem = false;
+      // this.serang = true;
+      // this.serangspecial = false;
+      // this.tangkis = false;
+      // this.giveUp = false;
+      // this.hit.play();
+      // this.kageKabur.pause();
+      // this.rasenGan.pause();
+      // console.log("nyerang");
     },
     enterName() {
       this.log = true;
