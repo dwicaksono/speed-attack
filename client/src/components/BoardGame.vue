@@ -1,6 +1,5 @@
 <template>
   <div>
-    <section class="row">
       <div class="small-6 columns">
         <h1 class="text-center">Player 1</h1>
         <div class="boxAktor" v-if="diem && !serang && !serangspecial && !tangkis && !giveUp">
@@ -65,6 +64,9 @@
 import rasengan from "../assets/naruto-voice-rasengan.mp3";
 import kage from "../assets/Kage.mp3";
 import hit from "../assets/hit.mp3";
+import themeSounds from "../Sounds/Theme_song.mp3";
+import startSound from "../Sounds/theme.mp3"
+
 export default {
   name: "BoardGame",
   data() {
@@ -88,12 +90,18 @@ export default {
       },
       rasenGan: new Audio(rasengan),
       kageKabur: new Audio(kage),
-      hit: new Audio(hit)
+      theme: new Audio(themeSounds),
+      start: new Audio(startSound),
+      hit: new Audio(hit),
     };
   },
-  mounted() {},
+  created(){
+    this.start.play()
+  },
   methods: {
     toActionStartGame() {
+      this.start.pause();
+      this.theme.play();
       this.$store.commit("startGame");
       this.diem = true;
       this.serang = false;
