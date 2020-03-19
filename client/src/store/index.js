@@ -1,14 +1,17 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+const socket = io("http://localhost:3000");
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    player1 : false,
+    player2 : false,
     player1Health: 100,
     player2Health: 100,
     gameIsRunning: false,
-    turns: []
+    turns: [],
+    players: []
   },
   mutations: {
     startGame(state) {
@@ -16,6 +19,13 @@ export default new Vuex.Store({
       state.player1Health = 100
       state.player2Health = 100
       state.turns = []
+    },
+    player1online(state) {
+      state.player1 = true
+    },
+    player2online(state) {
+      state.player1 = true
+      state.player2 = true
     },
     giveUp(state) {
       state.gameIsRunning = false
@@ -35,11 +45,8 @@ export default new Vuex.Store({
       // state.monsterAttack()
     },
     attackPoint(state, payload) {
-      state.player2Health -= payload
-      if (state.player2Health <= 0) {
-        state.player2Health = 0
-        state.gameIsRunning = false
-      }
+      socket.emit('playerAttack', payload)
+      // state.player2Health -= payload
     },
     specialAttackPoint(state, payload) {
       state.player2Health -= payload

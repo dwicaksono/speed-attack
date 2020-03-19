@@ -39,6 +39,8 @@
       <div class="small-12 columns">
         <ul>
           <li>TEXT</li>
+          <li>{{ this.$store.state.player1 }}</li>
+          <li>{{ this.$store.state.player2 }}</li>
         </ul>
       </div>
     </section>
@@ -46,16 +48,27 @@
 </template>
 
 <script>
-// import { mapState },
+var socket = io();
 
 export default {
   name: "BoardGame",
+  created() {
+    console.log('masuk')
+    socket.on('afterAttack', data => {
+      this.$store.state.player2Health -= data
+      if (this.$store.state.player2Health <= 0) {
+        this.$store.state.player2Health = 0
+        this.$store.state.gameIsRunning = false
+      }
+    })
+  },
   methods: {
     toActionStartGame() {
       this.$store.commit("startGame");
     },
     actionToAttack() {
       this.$store.dispatch("attack");
+      
     },
     actionToSpecial() {
       this.$store.dispatch("specialAttack");
@@ -65,7 +78,8 @@ export default {
     },
     dontGiveUp() {
       this.$store.commit("giveUp");
-    }
+    },
+    
   }
 };
 </script>
