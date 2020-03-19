@@ -1,23 +1,17 @@
 <template>
-  <div class="home">
-    <form action="">
-      <ul id="messages"></ul>
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-  </div>
+  <BoardGame />
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-const socket = io('http://localhost:3000')
+import BoardGame from "@/components/BoardGame.vue";
+const socket = io("http://localhost:3000");
 
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
-    HelloWorld
+    BoardGame
   },
-  methods: {
-  }
-}
+  methods: {}
+};
 </script>
