@@ -75,7 +75,6 @@
     <section class="row controls" v-else>
       <div class="small-12 columns">
         <button id="attack" @click.prevent="actionToAttack">ATTACK</button>
-        <button id="give-up" @click.prevent="dontGiveUp">GIVE UP</button>
       </div>
     </section>
     <section class="row log">
@@ -224,19 +223,6 @@ export default {
       this.kageKabur.pause();
       this.rasenGan.pause();
       console.log("nyerang");
-    },
-    dontGiveUp() {
-      this.$store.commit("giveUp");
-      this.diem = false;
-      this.serang = false;
-      this.serangspecial = false;
-      this.tangkis = false;
-      this.giveUp = true;
-
-      this.kageKabur.play();
-      this.rasenGan.pause();
-      this.hit.pause();
-      console.log("guveup");
     },
     enterName() {
       this.log = true;
