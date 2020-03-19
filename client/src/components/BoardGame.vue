@@ -2,32 +2,34 @@
   <div>
     <section class="row">
       <div class="small-6 columns">
-        <h1 class="text-center">YOU</h1>
+        <h1 class="text-center">Player 1</h1>
         <div class="healthbar">
           <div
             class="healthbar text-center"
             style="background-color: green; margin: 0; color: white;"
-          >playerHealth</div>
+            :style="{width:$store.state.player1Health + '%'}"
+          >{{ this.$store.state.player1Health }}</div>
         </div>
       </div>
       <div class="small-6 columns">
-        <h1 class="text-center">MONSTER</h1>
+        <h1 class="text-center">Player 2</h1>
         <div class="healthbar">
           <div
             class="healthbar text-center"
             style="background-color: green; margin: 0; color: white;"
-          >mosnter health</div>
+            :style="{width:$store.state.player2Health + '%'}"
+          >{{this.$store.state.player2Health}}</div>
         </div>
       </div>
     </section>
-    <section class="row controls" v-if="!gameIsRunning">
+    <section class="row controls" v-if="!$store.state.gameIsRunning">
       <div class="small-12 columns">
-        <button id="start-game">START NEW GAME</button>
+        <button id="start-game" @click="toActionStartGame">START NEW GAME</button>
       </div>
     </section>
     <section class="row controls" v-else>
       <div class="small-12 columns">
-        <button id="attack">ATTACK</button>
+        <button id="attack" @click="actionToAttack">ATTACK</button>
         <button id="special-attack">SPECIAL ATTACK</button>
         <button id="heal">HEAL</button>
         <button id="give-up">GIVE UP</button>
@@ -44,8 +46,18 @@
 </template>
 
 <script>
+// import { mapState },
+
 export default {
-  name: "BoardGame"
+  name: "BoardGame",
+  methods: {
+    toActionStartGame() {
+      this.$store.commit("startGame");
+    },
+    actionToAttack() {
+      this.$store.dispatch("attack");
+    }
+  }
 };
 </script>
 
