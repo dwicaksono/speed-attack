@@ -36,9 +36,17 @@ export default new Vuex.Store({
     },
     attackPoint(state, payload) {
       state.player2Health -= payload
+      if (state.player2Health <= 0) {
+        state.player2Health = 0
+        state.gameIsRunning = false
+      }
     },
     specialAttackPoint(state, payload) {
       state.player2Health -= payload
+      if (state.player2Health <= 0) {
+        state.player2Health = 0
+        state.gameIsRunning = false
+      }
     },
     attackPointText(state) {
       state.turns.unshift({
