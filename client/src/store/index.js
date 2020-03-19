@@ -57,7 +57,7 @@ export default new Vuex.Store({
       context.commit('attackPointText')
       // this.monsterAttack()
     },
-    specialAttack() {
+    specialAttack(context) {
       let damage = Math.max(Math.floor(Math.random() * 20) + 1, 5)
       context.commit('specialAttackPoint', damage)
       context.commit('attackPointText')

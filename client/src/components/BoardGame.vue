@@ -30,9 +30,9 @@
     <section class="row controls" v-else>
       <div class="small-12 columns">
         <button id="attack" @click="actionToAttack">ATTACK</button>
-        <button id="special-attack">SPECIAL ATTACK</button>
-        <button id="heal">HEAL</button>
-        <button id="give-up">GIVE UP</button>
+        <button id="special-attack" @click="actionToSpecial">SPECIAL ATTACK</button>
+        <button id="heal" @click="actionToHeal">HEAL</button>
+        <button id="give-up" @click="dontGiveUp">GIVE UP</button>
       </div>
     </section>
     <section class="row log">
@@ -56,6 +56,15 @@ export default {
     },
     actionToAttack() {
       this.$store.dispatch("attack");
+    },
+    actionToSpecial() {
+      this.$store.dispatch("specialAttack");
+    },
+    actionToHeal() {
+      this.$store.commit("heal");
+    },
+    dontGiveUp() {
+      this.$store.commit("giveUp");
     }
   }
 };
