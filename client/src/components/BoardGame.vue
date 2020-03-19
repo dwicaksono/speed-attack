@@ -98,6 +98,9 @@ import io from "socket.io-client";
 
 let count = 0;
 const socket = io("http://localhost:3000");
+import themeSounds from "../Sounds/Theme_song.mp3";
+import startSound from "../Sounds/theme.mp3"
+
 export default {
   name: "BoardGame",
   created() {
@@ -152,12 +155,18 @@ export default {
       },
       rasenGan: new Audio(rasengan),
       kageKabur: new Audio(kage),
-      hit: new Audio(hit)
+      theme: new Audio(themeSounds),
+      start: new Audio(startSound),
+      hit: new Audio(hit),
     };
   },
-  mounted() {},
+  created(){
+    this.start.play()
+  },
   methods: {
     toActionStartGame() {
+      this.start.pause();
+      this.theme.play();
       this.$store.commit("startGame");
       this.diem = true;
       this.serang = false;
