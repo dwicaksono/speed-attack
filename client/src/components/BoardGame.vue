@@ -1,51 +1,83 @@
 <template>
   <div>
     <section class="row">
+      <form @submit.prevent="enterName">
+        <input
+          type="text"
+          name=""
+          placeholder="Enter your name"
+          v-model="username"
+        />
+        <button type="submit">join</button>
+      </form>
       <div class="small-6 columns">
-        <h1 class="text-center">Player 1</h1>
-        <div class="boxAktor" v-if="diem && !serang && !serangspecial && !tangkis && !giveUp">
+        <h1 class="text-center">{{ this.$store.state.player1 }}</h1>
+        <div
+          class="boxAktor"
+          v-if="diem && !serang && !serangspecial && !tangkis && !giveUp"
+        >
           <img :src="dataImage.diem" alt />
         </div>
-        <div class="boxAktor" v-if="!diem && serang && !serangspecial && !tangkis && !giveUp">
+        <div
+          class="boxAktor"
+          v-if="!diem && serang && !serangspecial && !tangkis && !giveUp"
+        >
           <img :src="dataImage.attack" alt />
         </div>
-        <div class="boxAktor" v-if="!diem && !serang && serangspecial && !tangkis && !giveUp">
+        <div
+          class="boxAktor"
+          v-if="!diem && !serang && serangspecial && !tangkis && !giveUp"
+        >
           <img :src="dataImage.special" alt />
         </div>
-        <div class="boxAktor" v-if="!diem && !serang && !serangspecial && tangkis && !giveUp">
+        <div
+          class="boxAktor"
+          v-if="!diem && !serang && !serangspecial && tangkis && !giveUp"
+        >
           <img :src="dataImage.heal" alt />
         </div>
-        <div class="boxAktor" v-if="!diem && !serang && !serangspecial && !tangkis && giveUp">
+        <div
+          class="boxAktor"
+          v-if="!diem && !serang && !serangspecial && !tangkis && giveUp"
+        >
           <img :src="dataImage.giveUp" alt />
         </div>
         <div class="healthbar">
           <div
             class="healthbar text-center"
             style="background-color: green; margin: 0; color: white;"
-            :style="{width:$store.state.player1Health + '%'}"
-          >{{ this.$store.state.player1Health }}</div>
+            :style="{ width: $store.state.player1Health + '%' }"
+          >
+            {{ this.$store.state.player1Health }}
+          </div>
         </div>
       </div>
       <div class="small-6 columns">
-        <h1 class="text-center">Player 2</h1>
+        <h1 class="text-center">{{ this.$store.state.player2 }}</h1>
         <div class="healthbar">
           <div
             class="healthbar text-center"
             style="background-color: green; margin: 0; color: white;"
-            :style="{width:$store.state.player2Health + '%'}"
-          >{{this.$store.state.player2Health}}</div>
+            :style="{ width: $store.state.player2Health + '%' }"
+          >
+            {{ this.$store.state.player2Health }}
+          </div>
         </div>
       </div>
     </section>
     <section class="row controls" v-if="!$store.state.gameIsRunning">
       <div class="small-12 columns">
-        <button id="start-game" @click="toActionStartGame">START NEW GAME</button>
+        <button id="start-game" @click="toActionStartGame">
+          START NEW GAME
+        </button>
       </div>
     </section>
     <section class="row controls" v-else>
       <div class="small-12 columns">
         <button id="attack" @click="actionToAttack">ATTACK</button>
-        <button id="special-attack" @click="actionToSpecial">SPECIAL ATTACK</button>
+        <button id="special-attack" @click="actionToSpecial">
+          SPECIAL ATTACK
+        </button>
         <button id="heal" @click="actionToHeal">HEAL</button>
         <button id="give-up" @click="dontGiveUp">GIVE UP</button>
       </div>
@@ -63,22 +95,44 @@
 </template>
 
 <script>
-var socket = io();
-// import { mapState },
 import rasengan from "../assets/naruto-voice-rasengan.mp3";
 import kage from "../assets/Kage.mp3";
 import hit from "../assets/hit.mp3";
+import io from "socket.io-client";
+
+let count = 0;
+const socket = io("http://localhost:3000");
 export default {
   name: "BoardGame",
   created() {
-    console.log('masuk')
-    socket.on('afterAttack', data => {
-      this.$store.state.player2Health -= data
-      if (this.$store.state.player2Health <= 0) {
-        this.$store.state.player2Health = 0
-        this.$store.state.gameIsRunning = false
+    socket.on("afterAttack", data => {
+      if (localStorage.player == data.username) {
+        this.$store.state.player2Health -= data.damage;
+        if (this.$store.state.player2Health <= 0) {
+          this.$store.state.player2Health = 0;
+          this.$store.state.gameIsRunning = false;
+        }
+      } else {
+        this.$store.state.player1Health -= data.damage;
+        if (this.$store.state.player1Health <= 0) {
+          this.$store.state.player1Health = 0;
+          this.$store.state.gameIsRunning = false;
+        }
       }
-    })
+    });
+    socket.on("addPlayer", username => {
+      console.log(username);
+      if (!this.$store.state.player1 && !this.$store.state.player2) {
+        this.$store.state.player2 = username;
+      } else if (
+        this.$store.state.player1 &&
+        !this.$store.state.player2 &&
+        count > 0
+      ) {
+        this.$store.state.player2 = username;
+      }
+      count++;
+    });
   },
   data() {
     return {
@@ -87,6 +141,7 @@ export default {
       serangspecial: false,
       tangkis: false,
       giveUp: false,
+      username: null,
       dataImage: {
         diem:
           "https://rs1231.pbsrc.com/albums/ee503/adrian66645/Combate%20Mortal%20Total%20Album/naruto_standing1.gif~c200",
@@ -115,7 +170,7 @@ export default {
       this.giveUp = false;
     },
     actionToAttack() {
-      this.$store.dispatch("attack");
+      this.$store.dispatch("attack", this.username);
       this.diem = false;
       this.serang = true;
       this.serangspecial = false;
@@ -159,6 +214,10 @@ export default {
       this.rasenGan.pause();
       this.hit.pause();
       console.log("guveup");
+    },
+    enterName() {
+      localStorage.setItem("player", this.username);
+      this.$store.commit("addPlayer", this.username);
     }
   }
 };

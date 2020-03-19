@@ -11,9 +11,12 @@ io.on("connection", socket => {
     player--;
     console.log("ADA YG KELUAR");
   });
-  socket.on("playerAttack", data => {
+  socket.on("playerAttack", (data) => {
     socket.broadcast.emit("afterAttack", data);
   });
+  socket.on('addPlayer', username => {
+    socket.broadcast.emit('addPlayer', username)
+  })
   console.log("ADA YG MASUK ", player);
 });
 
