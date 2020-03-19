@@ -81,7 +81,7 @@
     <section class="row log">
       <div class="small-12 columns">
         <ul>
-          <li>TEXT</li>
+          <li>Players</li>
           <li>{{ this.$store.state.player1 }}</li>
           <li>{{ this.$store.state.player2 }}</li>
         </ul>
@@ -99,23 +99,65 @@ import io from "socket.io-client";
 let count = 0;
 const socket = io("http://localhost:3000");
 import themeSounds from "../Sounds/Theme_song.mp3";
-import startSound from "../Sounds/theme.mp3"
+import startSound from "../Sounds/theme.mp3";
+import Swal from "sweetalert2";
 
 export default {
   name: "BoardGame",
   created() {
+    // this.start.play()
     socket.on("afterAttack", data => {
       if (localStorage.player == data.username) {
         this.$store.state.player2Health -= data.damage;
         if (this.$store.state.player2Health <= 0) {
           this.$store.state.player2Health = 0;
           this.$store.state.gameIsRunning = false;
+          const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+              confirmButton: "btn btn-success",
+              cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: false
+          });
+
+          swalWithBootstrapButtons
+            .fire({
+              title: `${data.username} Won!`,
+              confirmButtonText: "Rematch?"
+            })
+            .then(result => {
+              this.$store.state.player1 = ''
+              this.$store.state.player2 = ''
+              localStorage.removeItem('player')
+              this.log = false
+              this.theme.pause()
+            });
         }
       } else {
         this.$store.state.player1Health -= data.damage;
         if (this.$store.state.player1Health <= 0) {
           this.$store.state.player1Health = 0;
           this.$store.state.gameIsRunning = false;
+          const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+              confirmButton: "btn btn-success",
+              cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: false
+          });
+
+          swalWithBootstrapButtons
+            .fire({
+              title: `${data.username} Won!`,
+              confirmButtonText: "Rematch?"
+            })
+            .then(result => {
+              this.$store.state.player1 = ''
+              this.$store.state.player2 = ''
+              localStorage.removeItem('player')
+              this.log = false
+              this.theme.pause()
+            });
         }
       }
     });
@@ -134,7 +176,7 @@ export default {
   },
   data() {
     return {
-      log:false,
+      log: false,
       diem: false,
       serang: false,
       serangspecial: false,
@@ -157,11 +199,8 @@ export default {
       kageKabur: new Audio(kage),
       theme: new Audio(themeSounds),
       start: new Audio(startSound),
-      hit: new Audio(hit),
+      hit: new Audio(hit)
     };
-  },
-  created(){
-    this.start.play()
   },
   methods: {
     toActionStartGame() {
@@ -200,8 +239,8 @@ export default {
       console.log("guveup");
     },
     enterName() {
-      this.log = true
-      this.toActionStartGame()
+      this.log = true;
+      this.toActionStartGame();
       localStorage.setItem("player", this.username);
       this.$store.commit("addPlayer", this.username);
     }
