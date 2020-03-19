@@ -10,7 +10,7 @@
         />
         <button type="submit">join</button>
       </form>
-      <div class="small-6 columns">
+      <div class="small-6 columns" v-if="log">
         <h1 class="text-center">{{ this.$store.state.player1 }}</h1>
         <div
           class="boxAktor"
@@ -52,7 +52,7 @@
           </div>
         </div>
       </div>
-      <div class="small-6 columns">
+      <div class="small-6 columns" v-if="log">
         <h1 class="text-center">{{ this.$store.state.player2 }}</h1>
         <div class="healthbar">
           <div
@@ -67,19 +67,15 @@
     </section>
     <section class="row controls" v-if="!$store.state.gameIsRunning">
       <div class="small-12 columns">
-        <button id="start-game" @click="toActionStartGame">
+        <!-- <button id="start-game" @click="toActionStartGame">
           START NEW GAME
-        </button>
+        </button> -->
       </div>
     </section>
     <section class="row controls" v-else>
       <div class="small-12 columns">
-        <button id="attack" @click="actionToAttack">ATTACK</button>
-        <button id="special-attack" @click="actionToSpecial">
-          SPECIAL ATTACK
-        </button>
-        <button id="heal" @click="actionToHeal">HEAL</button>
-        <button id="give-up" @click="dontGiveUp">GIVE UP</button>
+        <button id="attack" @click.prevent="actionToAttack">ATTACK</button>
+        <button id="give-up" @click.prevent="dontGiveUp">GIVE UP</button>
       </div>
     </section>
     <section class="row log">
@@ -121,7 +117,6 @@ export default {
       }
     });
     socket.on("addPlayer", username => {
-      console.log(username);
       if (!this.$store.state.player1 && !this.$store.state.player2) {
         this.$store.state.player2 = username;
       } else if (
@@ -136,6 +131,7 @@ export default {
   },
   data() {
     return {
+      log:false,
       diem: false,
       serang: false,
       serangspecial: false,
@@ -181,27 +177,6 @@ export default {
       this.rasenGan.pause();
       console.log("nyerang");
     },
-    actionToSpecial() {
-      this.$store.dispatch("specialAttack");
-      this.diem = false;
-      this.serang = false;
-      this.serangspecial = true;
-      this.tangkis = false;
-      this.giveUp = false;
-      this.rasenGan.play();
-      this.hit.pause();
-      this.kageKabur.pause();
-      console.log("nyerang sepecial");
-    },
-    actionToHeal() {
-      this.$store.commit("heal");
-      this.diem = false;
-      this.serang = false;
-      this.serangspecial = false;
-      this.tangkis = true;
-      this.giveUp = false;
-      console.log("action heal");
-    },
     dontGiveUp() {
       this.$store.commit("giveUp");
       this.diem = false;
@@ -216,6 +191,8 @@ export default {
       console.log("guveup");
     },
     enterName() {
+      this.log = true
+      this.toActionStartGame()
       localStorage.setItem("player", this.username);
       this.$store.commit("addPlayer", this.username);
     }

@@ -47,11 +47,7 @@ export default new Vuex.Store({
       // state.player2Health -= payload
     },
     specialAttackPoint(state, payload) {
-      state.player2Health -= payload
-      if (state.player2Health <= 0) {
-        state.player2Health = 0
-        state.gameIsRunning = false
-      }
+      socket.emit('playerAttack', payload)
     },
     attackPointText(state) {
       state.turns.unshift({
@@ -70,9 +66,10 @@ export default new Vuex.Store({
       context.commit('attackPointText')
       // this.monsterAttack()
     },
-    specialAttack(context) {
+    specialAttack(context, username) {
+      console.log('masuk special')
       let damage = Math.max(Math.floor(Math.random() * 20) + 1, 5)
-      context.commit('specialAttackPoint', damage)
+      context.commit('attackPoint', {damage, username})
       context.commit('attackPointText')
     },
   },
