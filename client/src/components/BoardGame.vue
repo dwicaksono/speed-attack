@@ -87,7 +87,7 @@ import hit from "../assets/hit.mp3";
 import io from "socket.io-client";
 
 let count = 0;
-const socket = io("http://localhost:3000");
+const socket = io("https://mysterious-thicket-65956.herokuapp.com/");
 import themeSounds from "../Sounds/Theme_song.mp3";
 import startSound from "../Sounds/theme.mp3";
 import Swal from "sweetalert2";
