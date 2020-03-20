@@ -1,8 +1,8 @@
 <template>
   <div>
     <section class="row">
-      <form @submit.prevent="enterName">
-        <input type="text" name placeholder="Enter your name" v-model="username" />
+      <form @submit.prevent="enterName" style="text-align: center; margin-top:100px;" v-if="!log">
+        <input type="text" name placeholder="Enter your name" v-model="username" /><br>
         <button type="submit">join</button>
       </form>
       <div class="small-6 columns" v-if="log">
@@ -65,7 +65,7 @@
     </section>
     <section class="row controls" v-else>
       <div class="small-12 columns">
-        <button id="attack" @click.prevent="actionToAttack">ATTACK</button>
+        <button id="attack" @click.prevent="actionToAttack" v-if="this.$store.state.player1 && this.$store.state.player2">ATTACK</button>
       </div>
     </section>
     <section class="row log">
@@ -95,18 +95,19 @@ import Swal from "sweetalert2";
 export default {
   name: "BoardGame",
   created() {
-    this.start.play();
     socket.on("afterAttack", data => {
       if (localStorage.player == data.username) {
         this.$store.state.player2Health -= data.damage;
         if (this.$store.state.player2Health <= 0) {
           this.$store.state.player2Health = 0;
           this.$store.state.gameIsRunning = false;
+          this.$store.state.player1 = "";
+          this.$store.state.player2 = "";
+          localStorage.removeItem("player");
           const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
               confirmButton: "btn btn-success",
-              cancelButton: "btn btn-danger",
-              allowOutsideClick: false
+              cancelButton: "btn btn-danger"
             },
             buttonsStyling: false
           });
@@ -114,32 +115,36 @@ export default {
           swalWithBootstrapButtons
             .fire({
               title: `${data.username} Won!`,
-              confirmButtonText: "Rematch?"
+              confirmButtonText: "Rematch?",
+              allowOutsideClick: false
             })
             .then(result => {
-              this.$store.state.player1 = "";
-              this.$store.state.player2 = "";
-              localStorage.removeItem("player");
               this.log = false;
               this.theme.pause();
+              count = 0;
             });
         }
         this.diem = false;
         this.serang = true;
+        setTimeout(() => {
+          this.diem = true;
+          this.serang = false;
+        }, 1000)
         this.hit.play();
         this.kageKabur.pause();
         this.rasenGan.pause();
-        console.log("nyerang");
       } else {
         this.$store.state.player1Health -= data.damage;
         if (this.$store.state.player1Health <= 0) {
           this.$store.state.player1Health = 0;
           this.$store.state.gameIsRunning = false;
+          this.$store.state.player1 = "";
+          this.$store.state.player2 = "";
+          localStorage.removeItem("player");
           const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
               confirmButton: "btn btn-success",
-              cancelButton: "btn btn-danger",
-              allowOutsideClick: false
+              cancelButton: "btn btn-danger"
             },
             buttonsStyling: false
           });
@@ -147,22 +152,24 @@ export default {
           swalWithBootstrapButtons
             .fire({
               title: `${data.username} Won!`,
-              confirmButtonText: "Rematch?"
+              confirmButtonText: "Rematch?",
+              allowOutsideClick: false
             })
             .then(result => {
-              this.$store.state.player1 = "";
-              this.$store.state.player2 = "";
-              localStorage.removeItem("player");
               this.log = false;
               this.theme.pause();
+              count = 0;
             });
         }
         this.diem2 = false;
         this.serang2 = true;
+        setTimeout(() => {
+          this.diem2 = true;
+          this.serang2 = false;
+        }, 1000)
         this.hit.play();
         this.kageKabur.pause();
         this.rasenGan.pause();
-        console.log("nyerang");
       }
     });
     socket.on("addPlayer", username => {
@@ -191,12 +198,6 @@ export default {
           "https://rs1231.pbsrc.com/albums/ee503/adrian66645/Combate%20Mortal%20Total%20Album/naruto_standing1.gif~c200",
         attack:
           "https://i.ya-webdesign.com/images/transparent-sprite-naruto-6.gif",
-        special:
-          "https://gifimage.net/wp-content/uploads/2017/10/naruto-bijuu-mode-rasenshuriken-gif-8.gif",
-        heal:
-          "https://thumbs.gfycat.com/SimilarGrandioseCornsnake-size_restricted.gif",
-        giveUp:
-          "https://thumbs.gfycat.com/IllustriousFoolishBlackpanther-size_restricted.gif"
       },
       rasenGan: new Audio(rasengan),
       kageKabur: new Audio(kage),
@@ -220,15 +221,6 @@ export default {
     },
     actionToAttack() {
       this.$store.dispatch("attack", this.username);
-      // this.diem = false;
-      // this.serang = true;
-      // this.serangspecial = false;
-      // this.tangkis = false;
-      // this.giveUp = false;
-      // this.hit.play();
-      // this.kageKabur.pause();
-      // this.rasenGan.pause();
-      // console.log("nyerang");
     },
     enterName() {
       this.log = true;
